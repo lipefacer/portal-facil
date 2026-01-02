@@ -1,0 +1,7 @@
+{
+  "name": "Portal Fácil - Mototáxi",
+  "description": "Uma plataforma mobile-first completa para conexão entre passageiros e mototaxistas locais, focada em simplicidade, rapidez e eficiência regional.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
