@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { AppSettings, CustomFee } from "./types";
+import { AppSettings } from "./types";
 
 export interface EstimationResult {
   distanceKm: number;
@@ -10,10 +10,21 @@ export interface EstimationResult {
   originFull: string;
   destinationFull: string;
   appliedFees: string[];
-  // Fix: Added optional coordinate properties to satisfy typing requirements in ClientView
   originCoords?: [number, number] | null;
   destCoords?: [number, number] | null;
 }
+
+// Função para calcular distância entre coordenadas (Haversine)
+const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  const R = 6371; // Raio da Terra em km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+};
 
 const isTimeInRange = (current: number, start: number, end: number) => {
   if (start < end) return current >= start && current < end;
@@ -23,32 +34,19 @@ const isTimeInRange = (current: number, start: number, end: number) => {
 export const estimateRideDetails = async (
   origin: string, 
   destination: string, 
-  settings: AppSettings
+  settings: AppSettings,
+  coords?: { origin: [number, number], dest: [number, number] }
 ): Promise<EstimationResult> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  let distanceKm = 0;
-  let originFull = origin;
-  let destinationFull = destination;
-
-  // Chamada simulada para API de geocodificação/distância (Exemplo Nomimatim)
-  try {
-    const params = new URLSearchParams({ origem: origin, destino: destination });
-    const distResponse = await fetch('https://camposfood.com/api/calc_distance.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: params.toString(),
-    });
-
-    if (distResponse.ok) {
-      const distData = await distResponse.json();
-      distanceKm = Number(distData.distancia_km) || 2.5;
-      originFull = distData.origem_completa || origin;
-      destinationFull = distData.destino_completo || destination;
-    }
-  } catch (error) { distanceKm = 3.0; }
+  
+  // Se não temos coordenadas, assumimos uma distância padrão para evitar erro de frete zero
+  let distanceKm = coords ? calculateDistance(coords.origin[0], coords.origin[1], coords.dest[0], coords.dest[1]) : 2.0;
+  
+  // Adiciona uma margem de 20% para curvas e trânsito (distância real vs linha reta)
+  distanceKm = distanceKm * 1.25;
 
   try {
-    const prompt = `Distância: ${distanceKm.toFixed(2)} km entre "${originFull}" e "${destinationFull}". Analise o trajeto para mototáxi e estime tempo (minutos) e explicação curta (máx 10 palavras).`;
+    const prompt = `Estime o tempo de viagem de mototáxi para um trajeto de ${distanceKm.toFixed(2)} km entre "${origin}" e "${destination}". Responda em JSON com "durationMin" (número) e "explanation" (string curta).`;
 
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
@@ -68,7 +66,7 @@ export const estimateRideDetails = async (
 
     const geminiData = JSON.parse(response.text.trim());
     
-    // Precificação
+    // Precificação baseada nas configurações do Admin
     let finalPrice = settings.baseFare + (distanceKm * settings.perKmRate);
     const appliedFees: string[] = [];
 
@@ -89,16 +87,26 @@ export const estimateRideDetails = async (
     return {
       distanceKm: Number(distanceKm.toFixed(2)),
       durationMin: geminiData.durationMin || 10,
-      estimatedPrice: Number(finalPrice.toFixed(2)),
+      estimatedPrice: Number(Math.max(settings.baseFare, finalPrice).toFixed(2)),
       explanation: geminiData.explanation || "Trajeto normal.",
-      originFull, destinationFull, appliedFees
+      originFull: origin,
+      destinationFull: destination,
+      appliedFees,
+      originCoords: coords?.origin,
+      destCoords: coords?.dest
     };
   } catch (error) {
+    console.error("Erro na estimativa Gemini:", error);
     return {
-      distanceKm, durationMin: 12,
-      estimatedPrice: settings.baseFare + (distanceKm * settings.perKmRate),
-      explanation: "Cálculo padrão de distância.",
-      originFull, destinationFull, appliedFees: []
+      distanceKm: Number(distanceKm.toFixed(2)),
+      durationMin: Math.ceil(distanceKm * 3), // Fallback: 3 min por km
+      estimatedPrice: Number((settings.baseFare + (distanceKm * settings.perKmRate)).toFixed(2)),
+      explanation: "Cálculo baseado em distância linear.",
+      originFull: origin,
+      destinationFull: destination,
+      appliedFees: [],
+      originCoords: coords?.origin,
+      destCoords: coords?.dest
     };
   }
 };
