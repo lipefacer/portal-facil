@@ -1,0 +1,4 @@
+
+User-agent: *
+Allow: /
+Sitemap: https://portalfacil-a3adb.web.app/sitemap.xml
