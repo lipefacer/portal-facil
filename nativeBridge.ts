@@ -1,7 +1,7 @@
 
 import { Capacitor } from '@capacitor/core';
 import { Geolocation } from '@capacitor/geolocation';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { Toast } from '@capacitor/toast';
 
 export const isNative = Capacitor.isNativePlatform();
@@ -12,12 +12,16 @@ export const nativeBridge = {
     if (isNative) {
       const permissions = await Geolocation.checkPermissions();
       if (permissions.location !== 'granted') {
-        await Geolocation.requestPermissions();
+        const req = await Geolocation.requestPermissions();
+        if (req.location !== 'granted') throw new Error("Permissão de GPS negada");
       }
+      
       const pos = await Geolocation.getCurrentPosition({
         enableHighAccuracy: true,
-        timeout: 10000
+        timeout: 15000,
+        maximumAge: 0
       });
+      
       return {
         lat: pos.coords.latitude,
         lng: pos.coords.longitude
@@ -33,17 +37,23 @@ export const nativeBridge = {
     }
   },
 
-  // Feedback de vibração ao usuário
+  // Feedback de vibração ao usuário (Essencial para motoristas)
   vibrate: async (style: ImpactStyle = ImpactStyle.Heavy) => {
     if (isNative) {
       await Haptics.impact({ style });
     }
   },
 
-  // Alerta nativo (Toast)
+  successVibrate: async () => {
+    if (isNative) {
+      await Haptics.notification({ type: NotificationType.Success });
+    }
+  },
+
+  // Alerta nativo (Toast) que aparece sobre o sistema
   showToast: async (text: string) => {
     if (isNative) {
-      await Toast.show({ text, duration: 'short' });
+      await Toast.show({ text, duration: 'long', position: 'bottom' });
     } else {
       console.log('Toast:', text);
     }
