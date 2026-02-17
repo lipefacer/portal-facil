@@ -1,23 +1,37 @@
 
 {
-  "name": "com.portalfacil.mototaxi",
+  "name": "portal-facil-mototaxi",
   "version": "1.0.0",
   "description": "App Nativo Portal Fácil Mototáxi",
+  "type": "module",
   "scripts": {
-    "build": "echo 'Build assets to dist folder'",
-    "sync": "npx cap sync",
-    "android": "npx cap open android",
-    "ios": "npx cap open ios",
-    "update": "npx cap update"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@capacitor/android": "^8.0.0",
-    "@capacitor/ios": "^8.0.0",
-    "@capacitor/core": "^8.0.0",
-    "@capacitor/geolocation": "^8.0.0",
-    "@capacitor/haptics": "^8.0.0",
-    "@capacitor/toast": "^8.0.0",
-    "@capacitor/push-notifications": "^8.0.0",
-    "@capacitor/local-notifications": "^8.0.0"
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/geolocation": "^6.0.0",
+    "@capacitor/haptics": "^6.0.0",
+    "@capacitor/ios": "^6.0.0",
+    "@capacitor/local-notifications": "^6.0.0",
+    "@capacitor/push-notifications": "^6.0.0",
+    "@capacitor/toast": "^6.0.0",
+    "@google/genai": "^0.1.2",
+    "firebase": "^10.8.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.4",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.1"
   }
 }

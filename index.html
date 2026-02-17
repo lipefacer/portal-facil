@@ -12,7 +12,7 @@
     <title>Portal Fácil - Mototáxi</title>
     
     <!-- Link para o Manifesto PWA -->
-    <link rel="manifest" href="./manifest.json">
+    <link rel="manifest" href="/manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -83,32 +83,34 @@
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
-</head>
-<body class="bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
-    <div id="root"></div>
-    <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@capacitor/core": "https://esm.sh/@capacitor/core@^8.0.0",
-    "@capacitor/cli": "https://esm.sh/@capacitor/cli@^8.0.0",
-    "@capacitor/toast": "https://esm.sh/@capacitor/toast@^8.0.0",
-    "@capacitor/local-notifications": "https://esm.sh/@capacitor/local-notifications@^8.0.0",
+    "vite": "https://esm.sh/vite@^7.3.1",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.4",
+    "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "firebase/": "https://esm.sh/firebase@^12.9.0/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "@capacitor/core": "https://esm.sh/@capacitor/core@^8.1.0",
+    "@capacitor/local-notifications": "https://esm.sh/@capacitor/local-notifications@^8.0.1",
+    "@capacitor/cli": "https://esm.sh/@capacitor/cli@^8.1.0",
+    "@capacitor/push-notifications": "https://esm.sh/@capacitor/push-notifications@^8.0.1",
     "@capacitor/haptics": "https://esm.sh/@capacitor/haptics@^8.0.0",
-    "@capacitor/geolocation": "https://esm.sh/@capacitor/geolocation@^8.0.0",
-    "@capacitor/push-notifications": "https://esm.sh/@capacitor/push-notifications@^8.0.0"
+    "@capacitor/geolocation": "https://esm.sh/@capacitor/geolocation@^8.1.0",
+    "@capacitor/toast": "https://esm.sh/@capacitor/toast@^8.0.1"
   }
 }
 </script>
-    <script type="module" src="./index.tsx"></script>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
     <script>
-      // Registro do Service Worker para PWA
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
+          navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed:', err));
         });
       }
     </script>

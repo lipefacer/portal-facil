@@ -1,5 +1,5 @@
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
   onAuthStateChanged as fbOnAuthStateChanged, 
@@ -7,7 +7,7 @@ import {
   createUserWithEmailAndPassword as fbCreateUserWithEmailAndPassword, 
   signOut as fbSignOut, 
   sendPasswordResetEmail as fbSendPasswordResetEmail 
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+} from "firebase/auth";
 import { 
   getFirestore, 
   doc as fbDoc, 
@@ -22,8 +22,8 @@ import {
   where as fbWhere,
   orderBy as fbOrderBy,
   limit as fbLimit
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-messaging.js";
+} from "firebase/firestore";
+import { getMessaging, getToken, onMessage, isSupported } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBFgChv2LW3kspfnae_WUl-0NRbIqp_8aM",
